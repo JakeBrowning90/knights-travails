@@ -75,3 +75,18 @@ function isMoveValid(outcome) {
 const startingCell = gameboard[3][6];
 console.log("From "+ startingCell.toString() + ", you can go to:");
 console.log(getPossibleMoves(startingCell));
+
+// Node factory
+class Node {
+    constructor(value = null) {
+        this.value = value;
+        this.moves = [];
+    }
+}
+
+// Tree factory
+class SearchTree {
+    constructor(square) {
+        this.root = this.buildTree(square);
+    }
+}
