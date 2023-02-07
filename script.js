@@ -74,6 +74,7 @@ class Node {
     constructor(value = null) {
         this.value = value;
         this.moves = [];
+        this.parentMoves = [];
     }
 }
 
@@ -81,12 +82,13 @@ class Node {
 class SearchTree {
     constructor(start, end) {
         this.root = this.buildTree(start, end);
-        this.loopingMoves = [];
     }
 
     buildTree(square, end){
+        // Base case: 
+
         let root = new Node(square);
-        root.moves = this.getPossibleMoves(square);
+        root.moves = this.getPossibleMoves(root);
         // Continue making roots if moves does not contain "end"
         // if (root.moves.includes(end) == false) {
         //     for (let i = 0; i < root.moves.length; i++) {
@@ -97,17 +99,17 @@ class SearchTree {
     }
 
     // Return the valid moves a knight can make from a given space
-    getPossibleMoves(cell) {
+    getPossibleMoves(square) {
         // Get all 8 moves a knight can possibly make
         const nextMoves = [
-            [cell[0] + 1, cell[1] + 2],
-            [cell[0] + 2, cell[1] + 1],
-            [cell[0] + 2, cell[1] - 1],
-            [cell[0] + 1, cell[1] - 2],
-            [cell[0] - 1, cell[1] - 2],
-            [cell[0] - 2, cell[1] - 1],
-            [cell[0] - 2, cell[1] + 1],
-            [cell[0] - 1, cell[1] + 2]]
+            [square[0] + 1, square[1] + 2],
+            [square[0] + 2, square[1] + 1],
+            [square[0] + 2, square[1] - 1],
+            [square[0] + 1, square[1] - 2],
+            [square[0] - 1, square[1] - 2],
+            [square[0] - 2, square[1] - 1],
+            [square[0] - 2, square[1] + 1],
+            [square[0] - 1, square[1] + 2]]
         // Return only the valid moves
         const validMoves = [];
         for (let i = 0; i < nextMoves.length; i++) {
@@ -115,13 +117,14 @@ class SearchTree {
                 validMoves.push(nextMoves[i]);
             }
         }
+        console.log(square.parentMoves);
         //this.loopingMoves.push(validMoves);
         return validMoves;
     }
 
     // Check if a move lands on the board and isn't revisting a square
     isMoveValid(outcome) {
-        if (outcome[0] < 0 || outcome[0] > 7 || outcome[1] < 0 || outcome[1] > 7) {
+        if (outcome[0] < 0 || outcome[0] > 7 || outcome[1] < 0 || outcome[1] > 7 ) {
             return false;
         } else {
             return true;
@@ -135,6 +138,7 @@ function knightMoves(start, end) {
     const search = new SearchTree(start, end);
     console.log(search.root.value);
     console.log(search.root.moves);
+    console.log(search.root);
     // Get all of root's valid moves, 
     
     // Recurse if valid moves do not include "end"
