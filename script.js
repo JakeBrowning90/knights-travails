@@ -15,7 +15,7 @@ function makeSimBoard() {
 }
 
 const gameboard = makeSimBoard();
-console.log(gameboard);
+// console.log(gameboard);
 
 //Create array of all gameboard spaces
 function makeCalcBoard() {
@@ -65,9 +65,9 @@ function isMoveValid(outcome) {
     }
 }
 
-const startingCell = gameboard[3][6];
-console.log("From "+ startingCell.toString() + ", you can go to:");
-console.log(getPossibleMoves(startingCell));
+// const startingCell = gameboard[3][6];
+// console.log("From "+ startingCell.toString() + ", you can go to:");
+// console.log(getPossibleMoves(startingCell));
 
 // Node factory
 class Node {
@@ -84,18 +84,28 @@ class SearchTree {
         this.root = this.buildTree(start, end);
     }
 
-    buildTree(square, end){
+    buildTree(square, end, moveHistory = []) {
         // Base case: 
-
+        if (square == end) {
+            return square;
+        }
+        //  else if (moveHistory.includes(square) == true) {
+        //         return null;
+        //  }
         let root = new Node(square);
-        root.moves = this.getPossibleMoves(root);
+        root.moves = this.getPossibleMoves(root.value);
+        root.parentMoves.push(...moveHistory)
+        console.log(root.parentMoves);
         // Continue making roots if moves does not contain "end"
-        // if (root.moves.includes(end) == false) {
-        //     for (let i = 0; i < root.moves.length; i++) {
-        //         root.moves[i] = this.buildTree(root.moves[i])
-        //     }
-        // }
+        if (root.moves.includes(end) == false ) {
+            for (let i = 0; i < root.moves.length; i++) {
+                if (root.parentMoves.includes(root.moves[i]) == false) {
+                    root.moves[i] = this.buildTree(root.moves[i], end, root.parentMoves)
+                }
+            }
+        }
         return root;
+              
     }
 
     // Return the valid moves a knight can make from a given space
@@ -109,7 +119,7 @@ class SearchTree {
             [square[0] - 1, square[1] - 2],
             [square[0] - 2, square[1] - 1],
             [square[0] - 2, square[1] + 1],
-            [square[0] - 1, square[1] + 2]]
+            [square[0] - 1, square[1] + 2]];
         // Return only the valid moves
         const validMoves = [];
         for (let i = 0; i < nextMoves.length; i++) {
@@ -117,8 +127,6 @@ class SearchTree {
                 validMoves.push(nextMoves[i]);
             }
         }
-        console.log(square.parentMoves);
-        //this.loopingMoves.push(validMoves);
         return validMoves;
     }
 
@@ -136,7 +144,7 @@ class SearchTree {
 function knightMoves(start, end) {
     // Set "start" as root of new tree
     const search = new SearchTree(start, end);
-    console.log(search.root.value);
+    // console.log(search.root.value);
     console.log(search.root.moves);
     console.log(search.root);
     // Get all of root's valid moves, 
