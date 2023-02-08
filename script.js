@@ -89,19 +89,26 @@ class SearchTree {
         if (square == end) {
             return square;
         }
-        //  else if (moveHistory.includes(square) == true) {
-        //         return null;
-        //  }
+        
         let root = new Node(square);
-        root.moves = this.getPossibleMoves(root.value);
-        root.parentMoves.push(...moveHistory)
+
+        let possibleMoves = this.getPossibleMoves(root.value);
+        root.moves = this.getNewMoves(possibleMoves, moveHistory);
+        root.parentMoves.push(moveHistory)
         console.log(root.parentMoves);
+        console.log(root.value);
+        let newParent = [];
+        newParent.push(root.value);
+        let pedigree = root.parentMoves.push(newParent);
+        console.log(pedigree);
+        // console.log(root.parentMoves);
         // Continue making roots if moves does not contain "end"
         if (root.moves.includes(end) == false ) {
             for (let i = 0; i < root.moves.length; i++) {
-                if (root.parentMoves.includes(root.moves[i]) == false) {
-                    root.moves[i] = this.buildTree(root.moves[i], end, root.parentMoves)
-                }
+                // if (root.parentMoves.includes(root.moves[i]) == false) {
+                    root.moves[i] = this.buildTree(root.moves[i], end, pedigree)
+                // }
+                // root.moves[i] = new Node(root.moves[i]);
             }
         }
         return root;
@@ -120,7 +127,7 @@ class SearchTree {
             [square[0] - 2, square[1] - 1],
             [square[0] - 2, square[1] + 1],
             [square[0] - 1, square[1] + 2]];
-        // Return only the valid moves
+        // Return only moves that don't go off the board
         const validMoves = [];
         for (let i = 0; i < nextMoves.length; i++) {
             if (this.isMoveValid(nextMoves[i]) == true) {
@@ -130,13 +137,25 @@ class SearchTree {
         return validMoves;
     }
 
-    // Check if a move lands on the board and isn't revisting a square
+    // Check if a move lands on the board
     isMoveValid(outcome) {
         if (outcome[0] < 0 || outcome[0] > 7 || outcome[1] < 0 || outcome[1] > 7 ) {
             return false;
         } else {
             return true;
         }
+    }
+
+    // Check if a move is going in a loop
+    getNewMoves(possibleMoves, moveHistory) {
+        console.log(moveHistory);
+        let newMoves = [];
+        for (let i = 0; i < possibleMoves.length; i++) {
+            if (moveHistory.includes(possibleMoves[i]) == false) {
+                newMoves.push(possibleMoves[i]);
+            }
+        }
+        return newMoves;
     }
 }
 
