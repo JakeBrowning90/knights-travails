@@ -18,21 +18,19 @@ const gameboard = makeSimBoard();
 // console.log(gameboard);
 
 //Create array of all gameboard spaces
-function makeCalcBoard() {
-    let spaceArray = [];
-    for (i = 0; i < 8; i++) {
-        for (j = 0; j < 8; j++) {
-            let cell = [];
-            cell.push(i);
-            cell.push(j);
-            spaceArray.push(cell)
-        }
-    }
-    return spaceArray;
-}
-
-const spaceArray = makeCalcBoard();
-//console.log(spaceArray);
+// function makeCalcBoard() {
+//     let spaceArray = [];
+//     for (i = 0; i < 8; i++) {
+//         for (j = 0; j < 8; j++) {
+//             let cell = [];
+//             cell.push(i);
+//             cell.push(j);
+//             spaceArray.push(cell)
+//         }
+//     }
+//     return spaceArray;
+// }
+// const spaceArray = makeCalcBoard();
 
 // Return the valid moves a knight can make from a given space
 function getPossibleMoves(cell) {
@@ -65,10 +63,6 @@ function isMoveValid(outcome) {
     }
 }
 
-// const startingCell = gameboard[3][6];
-// console.log("From "+ startingCell.toString() + ", you can go to:");
-// console.log(getPossibleMoves(startingCell));
-
 // Node factory
 class Node {
     constructor(value = null) {
@@ -97,18 +91,17 @@ class SearchTree {
         root.parentMoves.push(moveHistory)
         console.log(root.parentMoves);
         console.log(root.value);
-        let newParent = [];
-        newParent.push(root.value);
-        let pedigree = root.parentMoves.push(newParent);
-        console.log(pedigree);
+        const pedigree = root.parentMoves;
+        pedigree[pedigree.length] = root.value;
         // console.log(root.parentMoves);
         // Continue making roots if moves does not contain "end"
         if (root.moves.includes(end) == false ) {
             for (let i = 0; i < root.moves.length; i++) {
                 // if (root.parentMoves.includes(root.moves[i]) == false) {
-                    root.moves[i] = this.buildTree(root.moves[i], end, pedigree)
+                //     root.moves[i] = this.buildTree(root.moves[i], end, pedigree)
                 // }
-                // root.moves[i] = new Node(root.moves[i]);
+                root.moves[i] = new Node(root.moves[i]);
+                root.moves[i].moves = this.getPossibleMoves(root.moves[i].value);
             }
         }
         return root;
