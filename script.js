@@ -65,10 +65,10 @@ function isMoveValid(outcome) {
 
 // Node factory
 class Node {
-    constructor(value = null) {
+    constructor(value = null, parentMoves = null) {
         this.value = value;
-        this.moves = [];
-        this.parentMoves = [];
+        this.nextMoves = [];
+        this.parentMoves = parentMoves;
     }
 }
 
@@ -78,34 +78,37 @@ class SearchTree {
         this.root = this.buildTree(start, end);
     }
 
-    buildTree(square, end, moveHistory = []) {
-        // Base case: 
-        if (square == end) {
-            return square;
+    buildTree(square, goal, priorMoves  = [null]) {
+        // Base case: stop recursion once the goal square is found 
+        if (square == goal) {
+            console.log("Goal Found!")
+            const root = new Node(square, priorMoves);
+            return root;
         }
-        
-        let root = new Node(square);
+        const root = new Node(square, priorMoves);
+        const possibleMoves = this.getPossibleMoves(root.value);
+        root.nextMoves = this.getNewMoves(possibleMoves, priorMoves)
+        const moveHistory = [];
+        moveHistory.push(priorMoves);
+        moveHistory.push(root.value);
+        // console.log(moveHistory);
+        console.log(root);
+        // Check if nextMoves contains the goal
+        for (let i = 0; i < root.nextMoves.length; i++) {
+            // if (root.nextMoves[i][0] === goal[0] && root.nextMoves[i][1] === goal[1]) {
+            if (root.nextMoves[i].toString() === goal.toString()) {
+                console.log("Found it!");
+                const goalNode = new Node(goal, moveHistory);
+                return goalNode;
+            } 
+        }
 
-        let possibleMoves = this.getPossibleMoves(root.value);
-        root.moves = this.getNewMoves(possibleMoves, moveHistory);
-        root.parentMoves.push(moveHistory)
-        console.log(root.parentMoves);
-        console.log(root.value);
-        const pedigree = root.parentMoves;
-        pedigree[pedigree.length] = root.value;
-        // console.log(root.parentMoves);
-        // Continue making roots if moves does not contain "end"
-        if (root.moves.includes(end) == false ) {
-            for (let i = 0; i < root.moves.length; i++) {
-                // if (root.parentMoves.includes(root.moves[i]) == false) {
-                //     root.moves[i] = this.buildTree(root.moves[i], end, pedigree)
-                // }
-                root.moves[i] = new Node(root.moves[i]);
-                root.moves[i].moves = this.getPossibleMoves(root.moves[i].value);
-            }
+        // If no matches, get a new generation of nodes
+        for (let i = 0; i < root.nextMoves.length; i++){
+            root.nextMoves[i] = this.buildTree(root.nextMoves[i], goal, moveHistory);
         }
+
         return root;
-              
     }
 
     // Return the valid moves a knight can make from a given space
@@ -123,24 +126,16 @@ class SearchTree {
         // Return only moves that don't go off the board
         const validMoves = [];
         for (let i = 0; i < nextMoves.length; i++) {
-            if (this.isMoveValid(nextMoves[i]) == true) {
+            if ((nextMoves[i][0] >= 0 && nextMoves[i][0] <= 7) && (nextMoves[i][1] >= 0 && nextMoves[i][1] <= 7)) {
                 validMoves.push(nextMoves[i]);
             }
         }
         return validMoves;
     }
 
-    // Check if a move lands on the board
-    isMoveValid(outcome) {
-        if (outcome[0] < 0 || outcome[0] > 7 || outcome[1] < 0 || outcome[1] > 7 ) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
     // Check if a move is going in a loop
     getNewMoves(possibleMoves, moveHistory) {
+        console.log(possibleMoves);
         console.log(moveHistory);
         let newMoves = [];
         for (let i = 0; i < possibleMoves.length; i++) {
@@ -157,8 +152,7 @@ function knightMoves(start, end) {
     // Set "start" as root of new tree
     const search = new SearchTree(start, end);
     // console.log(search.root.value);
-    console.log(search.root.moves);
-    console.log(search.root);
+    console.log(search);
     // Get all of root's valid moves, 
     
     // Recurse if valid moves do not include "end"
@@ -167,4 +161,4 @@ function knightMoves(start, end) {
     //Return array [start, path, end]
     }
 
- knightMoves(gameboard[3][6], gameboard[0][0]);
+ knightMoves(gameboard[0][0], gameboard[1][2]);
