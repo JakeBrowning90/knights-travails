@@ -78,7 +78,7 @@ class SearchTree {
         this.root = this.buildTree(start, end);
     }
 
-    buildTree(square, goal, priorMoves  = [null]) {
+    buildTree(square, goal, priorMoves = []) {
         // Base case: stop recursion once the goal square is found 
         if (square == goal) {
             console.log("Goal Found!")
@@ -87,11 +87,12 @@ class SearchTree {
         }
         const root = new Node(square, priorMoves);
         const possibleMoves = this.getPossibleMoves(root.value);
+        console.log(priorMoves);
         root.nextMoves = this.getNewMoves(possibleMoves, priorMoves)
         const moveHistory = [];
+        priorMoves.push(root.value);
         moveHistory.push(priorMoves);
-        moveHistory.push(root.value);
-        // console.log(moveHistory);
+        console.log(moveHistory);
         console.log(root);
         // Check if nextMoves contains the goal
         for (let i = 0; i < root.nextMoves.length; i++) {
@@ -104,9 +105,9 @@ class SearchTree {
         }
 
         // If no matches, get a new generation of nodes
-        for (let i = 0; i < root.nextMoves.length; i++){
-            root.nextMoves[i] = this.buildTree(root.nextMoves[i], goal, moveHistory);
-        }
+        // for (let i = 0; i < root.nextMoves.length; i++){
+        //     root.nextMoves[i] = this.buildTree(root.nextMoves[i], goal, moveHistory);
+        // }
 
         return root;
     }
@@ -134,16 +135,18 @@ class SearchTree {
     }
 
     // Check if a move is going in a loop
-    getNewMoves(possibleMoves, moveHistory) {
+    getNewMoves(possibleMoves, priorMoves) {
         console.log(possibleMoves);
-        console.log(moveHistory);
-        let newMoves = [];
+        console.log(priorMoves);
         for (let i = 0; i < possibleMoves.length; i++) {
-            if (moveHistory.includes(possibleMoves[i]) == false) {
-                newMoves.push(possibleMoves[i]);
+            for (let j = 0; j < priorMoves.length; j++) {
+                if (possibleMoves[i].toString() == priorMoves[j].toString()) {
+                    possibleMoves.splice(i, 1);
+                }
             }
         }
-        return newMoves;
+        console.log(possibleMoves);
+        return possibleMoves;
     }
 }
 
@@ -161,4 +164,4 @@ function knightMoves(start, end) {
     //Return array [start, path, end]
     }
 
- knightMoves(gameboard[0][0], gameboard[1][2]);
+ knightMoves(gameboard[0][0], gameboard[1][3]);
